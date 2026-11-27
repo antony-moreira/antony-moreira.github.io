@@ -1,0 +1,72 @@
+---
+import Base from '../layouts/Base.astro';
+import type { Lang, Project } from '../data/site';
+import { profile } from '../data/site';
+import { ui, other } from '../i18n/ui';
+
+interface Props { lang: Lang; project: Project }
+const { lang, project: p } = Astro.props;
+const t = ui[lang];
+const alt = other(lang);
+---
+
+<Base lang={lang} title={`${p.title[lang]} — ${profile.name}`} description={p.summary[lang]} altHref={`${ui[alt].projectBase}${p.slug[alt]}/`}>
+  <article class="wrap">
+    <a class="back" href={`${t.home}#projects`}>{t.back}</a>
+    <h1>{p.title[lang]}</h1>
+    <p class="lead">{p.summary[lang]}</p>
+    {p.metric && (
+      <p class="metric"><strong>{p.metric.value}</strong> {p.metric.label[lang]}</p>
+    )}
+    {p.repo && <a class="btn ghost" href={p.repo}>{t.repo} ↗</a>}
+
+    <section>
+      {p.body[lang].map((para) => <p>{para}</p>)}
+    </section>
+
+    <section>
+      <h2>{t.highlights}</h2>
+      <ul class="hl">{p.highlights[lang].map((h) => <li>{h}</li>)}</ul>
+    </section>
+
+    {p.layers && (
+      <section>
+        <h2>{t.architecture}</h2>
+        <div class="layers">
+          {p.layers.map((l) => (
+            <div class="layer">
+              <span class="lname">{l.name[lang]}</span>
+              <ul class="tags">{l.items.map((i) => <li>{i}</li>)}</ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section>
+      <h2>{t.stack}</h2>
+      <ul class="tags">{p.stack.map((s) => <li>{s}</li>)}</ul>
+    </section>
+  </article>
+</Base>
+
+<style>
+  article { padding-top: 40px; padding-bottom: 40px; max-width: 760px; }
+  article section { padding: 24px 0 0; }
+  h1 { font-size: clamp(30px, 6vw, 44px); margin: 16px 0 12px; }
+  .back { font-size: 14px; }
+  .lead { font-size: 19px; color: var(--muted); }
+  .metric { color: var(--muted); }
+  .metric strong { font-family: var(--mono); font-size: 26px; color: var(--accent); margin-right: 6px; }
+  .hl { padding-left: 20px; }
+  .hl li { margin-bottom: 6px; }
+  .hl li::marker { color: var(--accent); }
+  .layers { display: flex; flex-direction: column; gap: 6px; }
+  .layer {
+    display: grid; grid-template-columns: 200px 1fr; gap: 12px; align-items: center;
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .lname { font-weight: 600; font-size: 14px; }
+  @media (max-width: 560px) { .layer { grid-template-columns: 1fr; gap: 6px; } }
+</style>

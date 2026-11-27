@@ -1,0 +1,48 @@
+import type { Lang } from '../data/site';
+
+export const ui = {
+  'pt-br': {
+    htmlLang: 'pt-BR',
+    nav: { about: 'Sobre', projects: 'Projetos', skills: 'Habilidades', contact: 'Contato' },
+    switchLabel: 'English',
+    hero: { cta: 'Ver projetos', github: 'GitHub' },
+    about: 'Sobre mim',
+    projects: 'Projetos',
+    projectsIntro: 'Infraestrutura real, rodando 24/7, versionada em Git.',
+    skills: 'Habilidades',
+    contact: 'Contato',
+    contactText: 'Aberto a oportunidades em infraestrutura, DevOps e SRE.',
+    readMore: 'Detalhes',
+    highlights: 'Destaques',
+    architecture: 'Arquitetura',
+    stack: 'Tecnologias',
+    repo: 'Ver repositório',
+    back: '← Todos os projetos',
+    footer: 'Feito com Astro e publicado no GitHub Pages.',
+    projectBase: '/projetos/',
+    home: '/',
+  },
+  en: {
+    htmlLang: 'en',
+    nav: { about: 'About', projects: 'Projects', skills: 'Skills', contact: 'Contact' },
+    switchLabel: 'Português',
+    hero: { cta: 'See projects', github: 'GitHub' },
+    about: 'About me',
+    projects: 'Projects',
+    projectsIntro: 'Real infrastructure, running 24/7, versioned in Git.',
+    skills: 'Skills',
+    contact: 'Contact',
+    contactText: 'Open to opportunities in infrastructure, DevOps and SRE.',
+    readMore: 'Details',
+    highlights: 'Highlights',
+    architecture: 'Architecture',
+    stack: 'Tech stack',
+    repo: 'View repository',
+    back: '← All projects',
+    footer: 'Built with Astro and published on GitHub Pages.',
+    projectBase: '/en/projects/',
+    home: '/en/',
+  },
+} as const satisfies Record<Lang, unknown>;
+
+export const other = (lang: Lang): Lang => (lang === 'pt-br' ? 'en' : 'pt-br');

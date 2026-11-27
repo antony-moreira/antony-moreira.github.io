@@ -17,6 +17,7 @@ const toc = [
   { id: 'how', label: t.howItWorks, show: !!p.how },
   { id: 'decisions', label: t.decisions, show: !!p.decisions },
   { id: 'challenges', label: t.challenges, show: !!p.challenges },
+  { id: 'gallery', label: t.gallery, show: !!p.gallery },
   { id: 'apps', label: t.apps, show: !!p.apps },
 ].filter((s) => s.show);
 ---
@@ -100,6 +101,20 @@ const toc = [
       </section>
     )}
 
+    {p.gallery && (
+      <section id="gallery">
+        <h2>{t.gallery}</h2>
+        <div class="gallery">
+          {p.gallery.map((g) => (
+            <figure class={g.wide ? 'shot wide' : 'shot'}>
+              <a href={g.src} target="_blank" rel="noopener"><img src={g.src} alt={g.caption[lang]} loading="lazy" decoding="async" /></a>
+              <figcaption>{g.caption[lang]}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+    )}
+
     {p.apps && (
       <section id="apps">
         <h2>{t.apps}</h2>
@@ -160,6 +175,16 @@ const toc = [
   .challenge { border-left: 3px solid var(--accent); padding: 4px 0 4px 16px; margin-bottom: 20px; }
   .challenge p { color: var(--muted); }
   .apps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .shot { margin: 0; }
+  .shot.wide { grid-column: 1 / -1; }
+  .shot img {
+    display: block; width: 100%; height: auto; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--surface); transition: border-color .15s;
+  }
+  .shot a:hover img { border-color: var(--accent); }
+  .shot figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  @media (max-width: 640px) { .gallery { grid-template-columns: 1fr; } }
   .bottom { margin-top: 40px; font-size: 14px; }
   @media (max-width: 560px) { .layer { grid-template-columns: 1fr; gap: 6px; } }
 </style>

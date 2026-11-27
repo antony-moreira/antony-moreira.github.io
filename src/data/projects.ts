@@ -18,7 +18,20 @@ export interface Project {
   decisions?: { title: T; why: T; tradeoff?: T }[];
   challenges?: { title: T; text: P }[];
   apps?: { group: T; items: string[] }[];
+  gallery?: Shot[]; // screenshots in public/screens (cropped, sensitive data blurred)
 }
+
+export interface Shot {
+  src: string;
+  caption: T;
+  wide?: boolean; // span the full gallery width
+}
+
+const shot = (src: string, pt: string, en: string, wide = false): Shot => ({
+  src: `/screens/${src}.webp`,
+  caption: { 'pt-br': pt, en },
+  wide,
+});
 
 export const projects: Project[] = [
   // ───────────────────────────────────────────── Kubernetes ─────────────
@@ -33,6 +46,15 @@ export const projects: Project[] = [
     },
     stack: ['Terraform', 'Kubespray', 'Kubernetes', 'Argo CD', 'Helm', 'Traefik', 'Gateway API', 'cert-manager', 'Sealed Secrets', 'MetalLB', 'NFS CSI', 'VictoriaMetrics'],
     metric: { value: '20+', label: { 'pt-br': 'apps entregues por GitOps', en: 'apps delivered through GitOps' } },
+    gallery: [
+      shot('argocd-resources', 'Argo CD: 30 Applications e 448 recursos, todos Synced e Healthy.', 'Argo CD: 30 Applications and 448 resources, all Synced and Healthy.', true),
+      shot('argocd-root-tree', 'App-of-apps: root → apps de plataforma → ApplicationSet → apps.', 'App-of-apps: root → platform apps → ApplicationSet → apps.'),
+      shot('argocd-appset-tree', 'O ApplicationSet gera uma Application por pasta no Git.', 'The ApplicationSet generates one Application per folder in Git.'),
+      shot('argocd-apps-list', 'Charts de terceiros com versão fixa + apps do repositório (env=homelab).', 'Pinned third-party charts + apps from the repo (env=homelab).', true),
+      shot('headlamp-map', 'Headlamp: mapa dos workloads agrupados por namespace (stack).', 'Headlamp: workloads map grouped by namespace (stack).', true),
+      shot('headlamp-nodes', '2 control-plane + 3 workers, Kubernetes v1.36.', '2 control-plane + 3 workers, Kubernetes v1.36.'),
+      shot('grafana-namespaces', 'Grafana: CPU e memória por pod e por namespace.', 'Grafana: CPU and memory per pod and per namespace.'),
+    ],
     body: {
       'pt-br': [
         'O objetivo foi sair de um único host Docker para uma plataforma declarativa, onde o estado do cluster é exatamente o que está no Git. Nada é aplicado à mão: um commit é o deploy, e reconstruir o cluster do zero é um comando.',
@@ -239,6 +261,10 @@ export const projects: Project[] = [
     stack: ['Proxmox VE', 'Docker Compose', 'Traefik', 'Cloudflare Tunnel', 'AdGuard Home', 'Tailscale', 'Nextcloud', 'Jellyfin', 'Uptime Kuma'],
     metric: { value: '3', label: { 'pt-br': 'nós Proxmox em quórum', en: 'Proxmox nodes in quorum' } },
     repo: 'https://github.com/antony-moreira/homelab',
+    gallery: [
+      shot('proxmox-datacenter', 'Cluster Proxmox com 3 nós: VMs do Kubernetes e NAS no chris, DNS/VPN/Wake-on-LAN no claire, Docker no leon.', '3-node Proxmox cluster: Kubernetes VMs and NAS on chris, DNS/VPN/Wake-on-LAN on claire, Docker on leon.', true),
+      shot('homarr-tiles', 'Homarr: painel com status de cada serviço.', 'Homarr: dashboard with every service status.', true),
+    ],
     body: {
       'pt-br': [
         'É a base de tudo: mídia, arquivos, fotos, backups do Mac, dashboards e automações da casa, rodando em mini PCs de baixo consumo e num servidor que só liga quando precisa.',
@@ -372,6 +398,12 @@ export const projects: Project[] = [
     stack: ['VictoriaMetrics', 'vmalert', 'Alertmanager', 'Grafana', 'node-exporter', 'cAdvisor', 'SMART', 'amtool'],
     metric: { value: '−90%', label: { 'pt-br': 'de RAM (~1,2 GB → ~110 MiB)', en: 'RAM (~1.2 GB → ~110 MiB)' } },
     repo: 'https://github.com/antony-moreira/homelab/tree/main/apps/monitoring-stack',
+    gallery: [
+      shot('grafana-homelab', 'Grafana do homelab, provisionado por arquivos: CPU, RAM e histórico de 12 h.', 'Homelab Grafana, provisioned from files: CPU, RAM and 12 h of history.', true),
+      shot('grafana-cluster', 'Dashboard do cluster: visão geral de CPU e memória dos 5 nós.', 'Cluster dashboard: CPU and memory overview across 5 nodes.', true),
+      shot('telegram-homelab', 'Alertas do homelab no Telegram: disparo, resolução com duração e disco de mídia cheio.', 'Homelab alerts on Telegram: firing, resolved with duration and media disk full.'),
+      shot('telegram-cluster', 'Alerta do cluster: emoji por stack, alvo e horário local.', 'Cluster alert: emoji per stack, target and local time.'),
+    ],
     body: {
       'pt-br': [
         'Em hardware modesto, o monitoramento não pode custar mais que as aplicações. A stack antiga (Netdata em cada host + Prometheus) usava ~1,2 GB só na VM principal. A nova faz o mesmo trabalho — e mais — com ~110 MiB.',

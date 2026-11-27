@@ -13,6 +13,7 @@ export interface Project {
   body: P; // overview paragraphs
   highlights: P;
   layers?: { name: T; items: string[] }[]; // architecture, top → bottom
+  diagram?: 'cluster'; // inline SVG diagram shown above the layers
   how?: { title: T; text: T }[]; // how it works, step by step
   decisions?: { title: T; why: T; tradeoff?: T }[];
   challenges?: { title: T; text: P }[];
@@ -23,6 +24,7 @@ export const projects: Project[] = [
   // ───────────────────────────────────────────── Kubernetes ─────────────
   {
     slug: { 'pt-br': 'kubernetes-gitops', en: 'kubernetes-gitops' },
+    diagram: 'cluster',
     title: { 'pt-br': 'Cluster Kubernetes com GitOps', en: 'GitOps Kubernetes Cluster' },
     summary: {
       'pt-br':

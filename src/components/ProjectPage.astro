@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import ClusterDiagram from './ClusterDiagram.astro';
 import type { Lang, Project } from '../data/site';
 import { profile } from '../data/site';
 import { ui, other } from '../i18n/ui';
@@ -46,6 +47,7 @@ const toc = [
     {p.layers && (
       <section id="architecture">
         <h2>{t.architecture}</h2>
+        {p.diagram === 'cluster' && <ClusterDiagram lang={lang} />}
         <div class="layers">
           {p.layers.map((l) => (
             <div class="layer">

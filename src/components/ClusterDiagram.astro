@@ -1,0 +1,190 @@
+---
+// Architecture diagram of the Kubernetes cluster (inline SVG, follows the site's light/dark tokens).
+// No IPs, domains or hostnames beyond generic role names: this site is public.
+import type { Lang } from '../data/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const L = {
+  'pt-br': {
+    caption: 'Arquitetura do cluster: do Git ao pod, tudo em um host Proxmox.',
+    admin: 'Admin', adminSub: 'Terraform · Kubespray',
+    git: 'Repositório Git', gitSub: 'fonte única da verdade',
+    users: 'Usuários', usersSub: 'rede local / VPN',
+    host: 'Proxmox VE · Xeon 20T · 31 GB · SSD + HDD 2 TB',
+    k8s: 'Kubernetes (Kubespray)',
+    cp: 'control plane', workers: 'workers · 6 GiB cada',
+    etcd: 'etcd 3/3', etcdSub: '2 masters + worker-0',
+    platform: 'GitOps e plataforma', apps: 'Apps (um namespace por stack)', obs: 'Storage e observabilidade',
+    nas: 'VM NAS', hdd: 'HDD 2 TB', hddSub: 'passthrough', nfs: 'export NFS', nfsSub: ['volumes RWX', 'mídia', 'backups'],
+    provision: 'cria VMs', sync: 'Argo CD puxa e sincroniza', https: 'HTTPS · IP MetalLB',
+    le: "Let's Encrypt", leSub: 'cert wildcard (DNS-01)',
+    tg: 'Telegram', tgSub: 'alertas',
+    vault: 'Cofre de senhas', vaultSub: 'backup da chave Sealed Secrets',
+    media: 'mídia', files: 'arquivos', home: 'casa', monitoring: 'monitoramento',
+  },
+  en: {
+    caption: 'Cluster architecture: from Git to pod, all on one Proxmox host.',
+    admin: 'Admin', adminSub: 'Terraform · Kubespray',
+    git: 'Git repository', gitSub: 'single source of truth',
+    users: 'Users', usersSub: 'LAN / VPN',
+    host: 'Proxmox VE · Xeon 20T · 31 GB · SSD + 2 TB HDD',
+    k8s: 'Kubernetes (Kubespray)',
+    cp: 'control plane', workers: 'workers · 6 GiB each',
+    etcd: 'etcd 3/3', etcdSub: '2 masters + worker-0',
+    platform: 'GitOps & platform', apps: 'Apps (one namespace per stack)', obs: 'Storage & observability',
+    nas: 'NAS VM', hdd: '2 TB HDD', hddSub: 'passthrough', nfs: 'NFS export', nfsSub: ['RWX volumes', 'media', 'backups'],
+    provision: 'creates VMs', sync: 'Argo CD pulls & syncs', https: 'HTTPS · MetalLB IP',
+    le: "Let's Encrypt", leSub: 'wildcard cert (DNS-01)',
+    tg: 'Telegram', tgSub: 'alerts',
+    vault: 'Password manager', vaultSub: 'Sealed Secrets key backup',
+    media: 'media', files: 'files', home: 'home', monitoring: 'monitoring',
+  },
+}[lang];
+
+// Lay out a row of chips left to right (approximate text width: 6.6 px per char at 11.5px).
+type Chip = { x: number; w: number; text: string; accent?: boolean };
+function row(items: (string | [string, boolean])[], x0 = 64, gap = 8): Chip[] {
+  let x = x0;
+  return items.map((it) => {
+    const [text, accent] = Array.isArray(it) ? it : [it, false];
+    const w = Math.round(text.length * 6.6 + 18);
+    const c = { x, w, text, accent };
+    x += w + gap;
+    return c;
+  });
+}
+const rows = [
+  { y: 352, label: L.platform, chips: row([['Argo CD', true], 'Traefik', 'cert-manager', 'MetalLB', 'Sealed Secrets']) },
+  { y: 410, label: L.apps, chips: row([L.media, L.files, L.home, L.monitoring, 'Helm chart: charts/app']) },
+  { y: 468, label: L.obs, chips: row(['local-path (SSD)', 'VictoriaMetrics', 'Grafana', 'Alertmanager', ['NFS CSI', true]]) },
+];
+---
+
+<figure class="diagram">
+  <div class="scroll">
+    <svg viewBox="0 0 800 640" role="img" aria-labelledby="dg-title">
+      <title id="dg-title">{L.caption}</title>
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="ah" />
+        </marker>
+      </defs>
+
+      <!-- external actors -->
+      <g class="ext">
+        <rect x="20" y="20" width="200" height="56" rx="10" />
+        <text x="120" y="44" class="t">{L.admin}</text><text x="120" y="62" class="s">{L.adminSub}</text>
+        <rect x="300" y="20" width="200" height="56" rx="10" class="hot" />
+        <text x="400" y="44" class="t">{L.git}</text><text x="400" y="62" class="s">{L.gitSub}</text>
+        <rect x="580" y="20" width="200" height="56" rx="10" />
+        <text x="680" y="44" class="t">{L.users}</text><text x="680" y="62" class="s">{L.usersSub}</text>
+      </g>
+
+      <!-- Proxmox host -->
+      <rect x="20" y="110" width="760" height="434" rx="14" class="host" />
+      <text x="764" y="535" class="h end">{L.host}</text>
+
+      <!-- Kubernetes -->
+      <rect x="36" y="144" width="560" height="372" rx="12" class="k8s" />
+      <text x="52" y="166" class="h">⎈ {L.k8s}</text>
+
+      <text x="52" y="190" class="lbl">{L.cp}</text>
+      <g class="node">
+        <rect x="52" y="196" width="170" height="50" rx="8" /><text x="137" y="217" class="t">master-0</text><text x="137" y="234" class="s">apiserver · etcd</text>
+        <rect x="234" y="196" width="170" height="50" rx="8" /><text x="319" y="217" class="t">master-1</text><text x="319" y="234" class="s">apiserver · etcd</text>
+      </g>
+      <rect x="416" y="196" width="164" height="50" rx="8" class="etcd" />
+      <text x="498" y="217" class="t">{L.etcd}</text><text x="498" y="234" class="s">{L.etcdSub}</text>
+
+      <text x="52" y="268" class="lbl">{L.workers}</text>
+      <g class="node">
+        <rect x="52" y="274" width="170" height="40" rx="8" /><text x="137" y="299" class="t">worker-0 · etcd</text>
+        <rect x="234" y="274" width="170" height="40" rx="8" /><text x="319" y="299" class="t">worker-1</text>
+        <rect x="416" y="274" width="164" height="40" rx="8" /><text x="498" y="299" class="t">worker-2</text>
+      </g>
+
+      <rect x="52" y="326" width="528" height="176" rx="10" class="band" />
+      {rows.map((r) => (
+        <g>
+          <text x="64" y={r.y - 8} class="lbl">{r.label}</text>
+          {r.chips.map((c) => (
+            <g class={c.accent ? 'chip hot' : 'chip'}>
+              <rect x={c.x} y={r.y} width={c.w} height="24" rx="6" />
+              <text x={c.x + c.w / 2} y={r.y + 16}>{c.text}</text>
+            </g>
+          ))}
+        </g>
+      ))}
+
+      <!-- NAS VM -->
+      <rect x="612" y="144" width="152" height="372" rx="12" class="k8s" />
+      <text x="688" y="170" class="t">{L.nas}</text>
+      <text x="688" y="188" class="s">OpenMediaVault</text>
+      <rect x="628" y="214" width="120" height="58" rx="8" class="etcd" />
+      <text x="688" y="238" class="t">🖴 {L.hdd}</text><text x="688" y="256" class="s">{L.hddSub}</text>
+      <rect x="628" y="420" width="120" height="70" rx="8" class="nfsbox" />
+      <text x="688" y="442" class="t">{L.nfs}</text>
+      {L.nfsSub.map((s, i) => <text x="688" y={460 + i * 13} class="s">{s}</text>)}
+      <line x1="688" y1="272" x2="688" y2="420" class="link" marker-end="url(#arr)" />
+
+      <!-- flows -->
+      <line x1="120" y1="76" x2="120" y2="108" class="flow" marker-end="url(#arr)" />
+      <text x="128" y="96" class="fl" text-anchor="start">{L.provision}</text>
+
+      <line x1="400" y1="144" x2="400" y2="78" class="flow dashed" marker-end="url(#arr)" />
+      <text x="408" y="98" class="fl" text-anchor="start">{L.sync}</text>
+
+      <path d="M604,76 V364 H584" class="flow" marker-end="url(#arr)" />
+      <text x="610" y="96" class="fl" text-anchor="start">{L.https}</text>
+
+      <line x1="562" y1="480" x2="626" y2="455" class="flow" marker-end="url(#arr)" />
+
+      <!-- bottom externals -->
+      <g class="ext">
+        <rect x="20" y="564" width="200" height="56" rx="10" />
+        <text x="120" y="588" class="t">🔑 {L.vault}</text><text x="120" y="606" class="s">{L.vaultSub}</text>
+        <rect x="300" y="564" width="200" height="56" rx="10" />
+        <text x="400" y="588" class="t">{L.le}</text><text x="400" y="606" class="s">{L.leSub}</text>
+        <rect x="580" y="564" width="200" height="56" rx="10" />
+        <text x="680" y="588" class="t">{L.tg}</text><text x="680" y="606" class="s">{L.tgSub}</text>
+      </g>
+      <line x1="120" y1="516" x2="120" y2="562" class="flow dashed" marker-end="url(#arr)" />
+      <line x1="400" y1="516" x2="400" y2="562" class="flow" marker-end="url(#arr)" />
+      <path d="M441,492 V546 H680 V562" class="flow" marker-end="url(#arr)" />
+    </svg>
+  </div>
+  <figcaption>{L.caption}</figcaption>
+</figure>
+
+<style>
+  .diagram { margin: 0 0 20px; }
+  .scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); padding: 8px; }
+  svg { display: block; width: 100%; min-width: 640px; height: auto; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+  figcaption { font-size: 13px; color: var(--muted); margin-top: 8px; text-align: center; }
+
+  rect { fill: var(--surface); stroke: var(--border); stroke-width: 1.5; }
+  .host { fill: none; stroke: var(--muted); stroke-dasharray: 6 4; }
+  .k8s { fill: color-mix(in srgb, var(--surface) 70%, transparent); stroke: var(--accent); stroke-opacity: .55; }
+  .band { fill: var(--bg); stroke: var(--border); }
+  .etcd, .nfsbox { fill: var(--accent-soft); stroke: var(--accent); stroke-opacity: .6; }
+  .hot rect, rect.hot { stroke: var(--accent); stroke-width: 2; }
+
+  text { fill: var(--text); text-anchor: middle; }
+  .t { font-size: 13px; font-weight: 600; }
+  .s { font-size: 11px; fill: var(--muted); }
+  .h { font-size: 12.5px; font-weight: 700; text-anchor: start; fill: var(--muted); }
+  .end { text-anchor: end; }
+  .lbl { font-size: 10.5px; text-anchor: start; fill: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .chip rect { fill: var(--surface); }
+  .chip text { font-size: 11.5px; font-family: ui-monospace, 'SF Mono', Menlo, monospace; fill: var(--text); }
+  .chip.hot rect { fill: var(--accent-soft); }
+  .chip.hot text { fill: var(--accent); font-weight: 600; }
+
+  .flow, .link { fill: none; stroke: var(--accent); stroke-width: 1.6; }
+  .dashed { stroke-dasharray: 5 4; }
+  .link { stroke-opacity: .7; }
+  .ah { fill: var(--accent); }
+  .fl { text-anchor: start; font-size: 11px; fill: var(--accent); font-weight: 600; }
+</style>

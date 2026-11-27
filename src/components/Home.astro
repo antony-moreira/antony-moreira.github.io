@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import type { Lang } from '../data/site';
-import { profile, projects, skills } from '../data/site';
+import { profile, projects, skills, stats, experience, education } from '../data/site';
 import { ui, other } from '../i18n/ui';
 
 interface Props { lang: Lang }
@@ -15,16 +15,41 @@ const { links } = profile;
     <p class="eyebrow">{profile.role[lang]}</p>
     <h1>{profile.name}</h1>
     <p class="lead">{profile.tagline[lang]}</p>
+    <p class="loc muted">📍 {profile.location[lang]}</p>
     <div class="actions">
       <a class="btn" href="#projects">{t.hero.cta}</a>
-      <a class="btn ghost" href={links.github}>{t.hero.github}</a>
       {links.linkedin && <a class="btn ghost" href={links.linkedin}>LinkedIn</a>}
+      <a class="btn ghost" href={links.github}>{t.hero.github}</a>
+    </div>
+    <div class="stats">
+      {stats.map((s) => (
+        <div class="stat"><strong>{s.value}</strong><span>{s.label[lang]}</span></div>
+      ))}
     </div>
   </section>
 
   <section class="wrap" id="about">
     <h2>{t.about}</h2>
     {profile.about[lang].map((p) => <p class="muted">{p}</p>)}
+  </section>
+
+  <section class="wrap" id="experience">
+    <h2>{t.experience}</h2>
+    <ol class="timeline">
+      {experience.map((j) => (
+        <li class="job">
+          <div class="jhead">
+            <div>
+              <h3>{j.role[lang]}</h3>
+              <p class="company">{j.company}{j.location && <span class="muted"> · {j.location}</span>}</p>
+            </div>
+            <span class="period">{j.period[lang]}</span>
+          </div>
+          <ul class="points">{j.points[lang].map((p) => <li>{p}</li>)}</ul>
+          <ul class="tags">{j.tags.map((s) => <li>{s}</li>)}</ul>
+        </li>
+      ))}
+    </ol>
   </section>
 
   <section class="wrap" id="projects">
@@ -55,14 +80,19 @@ const { links } = profile;
         </div>
       ))}
     </div>
+    <div class="card edu">
+      <h3>{t.education}</h3>
+      <p><strong>{education.degree[lang]}</strong><br /><span class="muted">{education.school}</span></p>
+      <ul class="tags">{education.certs.map((c) => <li>🏅 {c}</li>)}</ul>
+    </div>
   </section>
 
   <section class="wrap" id="contact">
     <h2>{t.contact}</h2>
     <p class="muted">{t.contactText}</p>
     <div class="actions">
-      {links.email && <a class="btn" href={`mailto:${links.email}`}>{links.email}</a>}
-      {links.linkedin && <a class="btn ghost" href={links.linkedin}>LinkedIn</a>}
+      {links.linkedin && <a class="btn" href={links.linkedin}>LinkedIn</a>}
+      {links.email && <a class="btn ghost" href={`mailto:${links.email}`}>{links.email}</a>}
       <a class="btn ghost" href={links.github}>GitHub</a>
     </div>
   </section>
@@ -71,8 +101,13 @@ const { links } = profile;
 <style>
   .hero { padding-top: 88px; }
   .hero h1 { font-size: clamp(36px, 7vw, 56px); margin: 8px 0 16px; }
-  .lead { font-size: 19px; color: var(--muted); max-width: 640px; }
+  .lead { font-size: 19px; color: var(--muted); max-width: 680px; }
+  .loc { font-size: 14px; margin: 0; }
   .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 40px; }
+  .stat { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; display: flex; flex-direction: column; }
+  .stat strong { font-family: var(--mono); font-size: 28px; color: var(--accent); line-height: 1.2; }
+  .stat span { font-size: 14px; color: var(--muted); }
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 20px; }
   .card h3 { margin: 0 0 8px; font-size: 18px; }
   .project { color: var(--text); display: flex; flex-direction: column; gap: 4px; transition: border-color .15s, transform .15s; }
@@ -81,4 +116,20 @@ const { links } = profile;
   .metric { margin: 0 0 6px; font-size: 13px; color: var(--muted); }
   .metric strong { font-family: var(--mono); font-size: 22px; color: var(--accent); }
   .more { margin-top: 12px; font-size: 14px; color: var(--accent); }
+  .edu { margin-top: 16px; }
+  .edu p { margin: 0 0 12px; }
+
+  .timeline { list-style: none; padding: 0; margin: 24px 0 0; border-left: 2px solid var(--border); }
+  .job { position: relative; padding: 0 0 28px 24px; }
+  .job::before {
+    content: ''; position: absolute; left: -7px; top: 6px; width: 12px; height: 12px;
+    border-radius: 50%; background: var(--bg); border: 2px solid var(--accent);
+  }
+  .job:first-child::before { background: var(--accent); }
+  .jhead { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .job h3 { margin: 0; font-size: 18px; }
+  .company { margin: 2px 0 0; font-weight: 600; color: var(--accent); }
+  .period { font-family: var(--mono); font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .points { padding-left: 18px; margin: 10px 0 12px; color: var(--muted); }
+  .points li { margin-bottom: 4px; }
 </style>

@@ -6,8 +6,8 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
   site: 'https://antony-moreira.github.io',
   i18n: {
-    defaultLocale: 'pt-br',
-    locales: ['pt-br', 'en'],
-    routing: { prefixDefaultLocale: false }, // pt-BR at "/", English at "/en/"
+    defaultLocale: 'en',
+    locales: ['en', 'pt-br'],
+    routing: { prefixDefaultLocale: false }, // English at "/", pt-BR at "/pt-br/"
   },
 });

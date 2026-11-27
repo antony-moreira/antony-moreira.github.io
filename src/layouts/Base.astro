@@ -40,6 +40,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       <div class="wrap bar">
         <a class="brand" href={t.home}>{profile.name}</a>
         <nav>
+          <a href={`${t.home}#experience`}>{t.nav.experience}</a>
           <a href={`${t.home}#projects`}>{t.nav.projects}</a>
           <a href={`${t.home}#skills`}>{t.nav.skills}</a>
           <a href={`${t.home}#contact`}>{t.nav.contact}</a>

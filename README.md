@@ -1,6 +1,6 @@
 # Portfolio
 
-Personal portfolio built with [Astro](https://astro.build), in Brazilian Portuguese (`/`) and English (`/en/`).
+Personal portfolio built with [Astro](https://astro.build), in English (`/`) and Brazilian Portuguese (`/pt-br/`).
 Published on GitHub Pages at https://antony-moreira.github.io.
 
 ## Editing content
@@ -9,7 +9,7 @@ All text lives in [`src/data/site.ts`](src/data/site.ts) (profile, skills, proje
 UI labels are in [`src/i18n/ui.ts`](src/i18n/ui.ts).
 
 To add a project, append an entry to `projects` in `site.ts`; its pages are generated at
-`/projetos/<slug>/` and `/en/projects/<slug>/`.
+`/projects/<slug>/` and `/pt-br/projetos/<slug>/`.
 
 ## Local development
 

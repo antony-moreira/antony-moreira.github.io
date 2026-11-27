@@ -8,6 +8,16 @@ interface Props { lang: Lang; project: Project }
 const { lang, project: p } = Astro.props;
 const t = ui[lang];
 const alt = other(lang);
+
+// In-page table of contents: only sections this project has.
+const toc = [
+  { id: 'overview', label: t.overview, show: true },
+  { id: 'architecture', label: t.architecture, show: !!p.layers },
+  { id: 'how', label: t.howItWorks, show: !!p.how },
+  { id: 'decisions', label: t.decisions, show: !!p.decisions },
+  { id: 'challenges', label: t.challenges, show: !!p.challenges },
+  { id: 'apps', label: t.apps, show: !!p.apps },
+].filter((s) => s.show);
 ---
 
 <Base lang={lang} title={`${p.title[lang]} — ${profile.name}`} description={p.summary[lang]} altHref={`${ui[alt].projectBase}${p.slug[alt]}/`}>
@@ -15,22 +25,26 @@ const alt = other(lang);
     <a class="back" href={`${t.home}#projects`}>{t.back}</a>
     <h1>{p.title[lang]}</h1>
     <p class="lead">{p.summary[lang]}</p>
-    {p.metric && (
-      <p class="metric"><strong>{p.metric.value}</strong> {p.metric.label[lang]}</p>
+    <div class="meta">
+      {p.metric && <p class="metric"><strong>{p.metric.value}</strong> {p.metric.label[lang]}</p>}
+      {p.repo && <a class="btn ghost" href={p.repo}>{t.repo} ↗</a>}
+    </div>
+    <ul class="tags">{p.stack.map((s) => <li>{s}</li>)}</ul>
+
+    {toc.length > 2 && (
+      <nav class="toc" aria-label="Contents">
+        {toc.map((s) => <a href={`#${s.id}`}>{s.label}</a>)}
+      </nav>
     )}
-    {p.repo && <a class="btn ghost" href={p.repo}>{t.repo} ↗</a>}
 
-    <section>
+    <section id="overview">
+      <h2>{t.overview}</h2>
       {p.body[lang].map((para) => <p>{para}</p>)}
-    </section>
-
-    <section>
-      <h2>{t.highlights}</h2>
       <ul class="hl">{p.highlights[lang].map((h) => <li>{h}</li>)}</ul>
     </section>
 
     {p.layers && (
-      <section>
+      <section id="architecture">
         <h2>{t.architecture}</h2>
         <div class="layers">
           {p.layers.map((l) => (
@@ -43,21 +57,80 @@ const alt = other(lang);
       </section>
     )}
 
-    <section>
-      <h2>{t.stack}</h2>
-      <ul class="tags">{p.stack.map((s) => <li>{s}</li>)}</ul>
-    </section>
+    {p.how && (
+      <section id="how">
+        <h2>{t.howItWorks}</h2>
+        <ol class="steps">
+          {p.how.map((s) => (
+            <li>
+              <h3>{s.title[lang]}</h3>
+              <p>{s.text[lang]}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    {p.decisions && (
+      <section id="decisions">
+        <h2>{t.decisions}</h2>
+        <div class="decisions">
+          {p.decisions.map((d) => (
+            <div class="card decision">
+              <h3>{d.title[lang]}</h3>
+              <p><span class="label">{t.why}</span> {d.why[lang]}</p>
+              {d.tradeoff && <p class="tradeoff"><span class="label">{t.tradeoff}</span> {d.tradeoff[lang]}</p>}
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {p.challenges && (
+      <section id="challenges">
+        <h2>{t.challenges}</h2>
+        {p.challenges.map((c) => (
+          <div class="challenge">
+            <h3>{c.title[lang]}</h3>
+            {c.text[lang].map((para) => <p>{para}</p>)}
+          </div>
+        ))}
+      </section>
+    )}
+
+    {p.apps && (
+      <section id="apps">
+        <h2>{t.apps}</h2>
+        <div class="apps">
+          {p.apps.map((g) => (
+            <div class="card">
+              <h3>{g.group[lang]}</h3>
+              <ul class="tags">{g.items.map((i) => <li>{i}</li>)}</ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <p class="bottom"><a href={`${t.home}#projects`}>{t.back}</a></p>
   </article>
 </Base>
 
 <style>
-  article { padding-top: 40px; padding-bottom: 40px; max-width: 760px; }
-  article section { padding: 24px 0 0; }
+  article { padding-top: 40px; padding-bottom: 40px; max-width: 800px; }
+  article section { padding: 36px 0 0; scroll-margin-top: 72px; }
   h1 { font-size: clamp(30px, 6vw, 44px); margin: 16px 0 12px; }
+  h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 16px; }
+  h3 { font-size: 17px; margin: 0 0 6px; }
   .back { font-size: 14px; }
   .lead { font-size: 19px; color: var(--muted); }
-  .metric { color: var(--muted); }
+  .meta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .metric { color: var(--muted); margin: 0; }
   .metric strong { font-family: var(--mono); font-size: 26px; color: var(--accent); margin-right: 6px; }
+  .toc {
+    display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 24px; padding: 12px 16px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; font-size: 14px;
+  }
   .hl { padding-left: 20px; }
   .hl li { margin-bottom: 6px; }
   .hl li::marker { color: var(--accent); }
@@ -68,5 +141,23 @@ const alt = other(lang);
     border-radius: 8px; padding: 10px 14px;
   }
   .lname { font-weight: 600; font-size: 14px; }
+  .steps { list-style: none; padding: 0; margin: 0; border-left: 2px solid var(--border); }
+  .steps li { position: relative; padding: 0 0 18px 22px; }
+  .steps li::before {
+    content: ''; position: absolute; left: -6px; top: 7px; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--accent);
+  }
+  .steps p { margin: 0; color: var(--muted); }
+  .decisions { display: grid; gap: 12px; }
+  .decision p { margin: 6px 0 0; color: var(--muted); }
+  .label {
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+    color: var(--accent); background: var(--accent-soft); padding: 1px 6px; border-radius: 4px; margin-right: 4px;
+  }
+  .tradeoff .label { color: var(--muted); background: var(--border); }
+  .challenge { border-left: 3px solid var(--accent); padding: 4px 0 4px 16px; margin-bottom: 20px; }
+  .challenge p { color: var(--muted); }
+  .apps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .bottom { margin-top: 40px; font-size: 14px; }
   @media (max-width: 560px) { .layer { grid-template-columns: 1fr; gap: 6px; } }
 </style>

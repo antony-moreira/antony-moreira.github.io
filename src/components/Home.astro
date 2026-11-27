@@ -12,8 +12,13 @@ const { links } = profile;
 
 <Base lang={lang} title={`${profile.name} — ${profile.role[lang]}`} description={profile.tagline[lang]} altHref={ui[other(lang)].home}>
   <section class="wrap hero">
-    <p class="eyebrow">{profile.role[lang]}</p>
-    <h1>{profile.name}</h1>
+    <div class="intro">
+      <img class="photo" src={profile.photo} alt={profile.name} width="160" height="160" />
+      <div>
+        <p class="eyebrow">{profile.role[lang]}</p>
+        <h1>{profile.name}</h1>
+      </div>
+    </div>
     <p class="lead">{profile.tagline[lang]}</p>
     <p class="loc muted">📍 {profile.location[lang]}</p>
     <div class="actions">
@@ -100,7 +105,13 @@ const { links } = profile;
 
 <style>
   .hero { padding-top: 88px; }
-  .hero h1 { font-size: clamp(36px, 7vw, 56px); margin: 8px 0 16px; }
+  .hero h1 { font-size: clamp(36px, 7vw, 56px); margin: 8px 0 0; }
+  .intro { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; margin-bottom: 20px; }
+  .photo {
+    width: 160px; height: 160px; border-radius: 50%; object-fit: cover;
+    border: 3px solid var(--accent); box-shadow: 0 0 0 6px var(--accent-soft);
+  }
+  @media (max-width: 560px) { .photo { width: 112px; height: 112px; } }
   .lead { font-size: 19px; color: var(--muted); max-width: 680px; }
   .loc { font-size: 14px; margin: 0; }
   .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }

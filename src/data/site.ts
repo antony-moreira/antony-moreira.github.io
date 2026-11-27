@@ -4,6 +4,8 @@ type T = Record<Lang, string>;
 
 export const profile = {
   name: 'Antony Moreira',
+  // Profile photo: GitHub avatar (updates with GitHub). To use your own, drop public/photo.jpg and set '/photo.jpg'.
+  photo: 'https://avatars.githubusercontent.com/u/64423160?s=400&v=4',
   role: {
     'pt-br': 'Senior DevOps / Platform Engineer · SRE · Kubernetes',
     en: 'Senior DevOps / Platform Engineer · SRE · Kubernetes',
